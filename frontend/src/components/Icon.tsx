@@ -14,6 +14,7 @@ const PATHS: Record<string, string> = {
   whatsapp: "M20 12a8 8 0 0 1-11.8 7L4 20l1.1-4A8 8 0 1 1 20 12ZM9 9.5c0 3 2.5 5.5 5.5 5.5l1-1.5-2-1-1 .8a4 4 0 0 1-2-2l.8-1-1-2L9 9.5Z",
   download: "M12 4v12M6 10l6 6 6-6M4 20h16",
   sidebar: "M3 4h18v16H3zM9 4v16",
+  list: "M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01",
 };
 
 export default function Icon({ name, size = 18, className = "" }: { name: string; size?: number; className?: string }) {
@@ -25,13 +26,28 @@ export default function Icon({ name, size = 18, className = "" }: { name: string
   );
 }
 
-export function Logo({ size = 26 }: { size?: number }) {
+/** Red ledger-book mark (VyaparMitra style). */
+export function Logo({ size = 34 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden="true">
-      <rect x="4" y="5" width="20" height="24" rx="3" fill="#0f172a" />
-      <rect x="8" y="3" width="20" height="24" rx="3" fill="white" stroke="#0f172a" strokeWidth="2" />
-      <path d="M12 10h12M12 15h12M12 20h8" stroke="#0f172a" strokeWidth="2" strokeLinecap="round" />
-      <circle cx="24" cy="22" r="4" fill="#2563eb" />
+    <svg width={size} height={size} viewBox="0 0 40 40" fill="none" aria-hidden="true" className="shrink-0">
+      <defs>
+        <linearGradient id="muneem-logo-bg" x1="2" y1="2" x2="38" y2="38" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#EF4444" />
+          <stop offset="100%" stopColor="#B91C1C" />
+        </linearGradient>
+      </defs>
+      <rect x="2" y="2" width="36" height="36" rx="10" fill="url(#muneem-logo-bg)" />
+      <rect x="2.5" y="2.5" width="35" height="35" rx="9.5" stroke="white" strokeOpacity="0.18" />
+      <path d="M9.5 11.5C9.5 10.67 10.17 10 11 10H18.5C19.33 10 20 10.67 20 11.5V29.5C20 28.67 19.33 28 18.5 28H11C10.17 28 9.5 27.33 9.5 26.5V11.5Z" fill="#FFFFFF" />
+      <path d="M30.5 11.5C30.5 10.67 29.83 10 29 10H21.5C20.67 10 20 10.67 20 11.5V29.5C20 28.67 20.67 28 21.5 28H29C29.83 28 30.5 27.33 30.5 26.5V11.5Z" fill="#FEE2E2" />
+      <rect x="19.3" y="10.2" width="1.4" height="19.3" rx="0.7" fill="#DC2626" />
+      <rect x="12" y="14" width="5.5" height="1.6" rx="0.8" fill="#DC2626" fillOpacity="0.85" />
+      <rect x="12" y="17.8" width="4.5" height="1.6" rx="0.8" fill="#DC2626" fillOpacity="0.55" />
+      <rect x="12" y="21.6" width="5.5" height="1.6" rx="0.8" fill="#DC2626" fillOpacity="0.55" />
+      <rect x="22.5" y="14" width="5.5" height="1.6" rx="0.8" fill="#B91C1C" fillOpacity="0.8" />
+      <rect x="22.5" y="17.8" width="4.5" height="1.6" rx="0.8" fill="#B91C1C" fillOpacity="0.5" />
+      <rect x="22.5" y="21.6" width="5.5" height="1.6" rx="0.8" fill="#B91C1C" fillOpacity="0.5" />
+      <path d="M25.5 27.5V32.5L27.25 31.1L29 32.5V27.5H25.5Z" fill="#FCD34D" />
     </svg>
   );
 }

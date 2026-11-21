@@ -28,7 +28,9 @@ export default function Home({ onChatsChanged }: { onChatsChanged: () => void })
 
   useEffect(() => {
     if (cid && cid !== chat.conversationId) chat.load(cid).catch(() => navigate("/", { replace: true }));
-    if (!cid) chat.reset();
+    // A handed-over question resets the thread itself (below); resetting here too would wipe the
+    // question it just sent when React re-runs effects (StrictMode) and crash the stream.
+    if (!cid && !loc.state?.ask) chat.reset();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cid, loc.state?.fresh]);
 
@@ -36,6 +38,7 @@ export default function Home({ onChatsChanged }: { onChatsChanged: () => void })
     const q = loc.state?.ask;
     if (q && asked.current !== loc.state?.fresh) {
       asked.current = loc.state?.fresh ?? 0;
+      chat.reset();
       chat.send(q, mode);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

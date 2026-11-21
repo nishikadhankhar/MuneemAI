@@ -4,10 +4,10 @@ export function Card({ title, right, children, className = "" }: {
   title?: ReactNode; right?: ReactNode; children: ReactNode; className?: string;
 }) {
   return (
-    <section className={`rounded-lg border border-line bg-surface p-4 shadow-sm ${className}`}>
+    <section className={`min-w-0 rounded-xl border border-line bg-surface p-4 shadow-card sm:p-5 ${className}`}>
       {(title || right) && (
-        <div className="mb-3 flex items-center justify-between gap-2">
-          {title && <h2 className="text-sm font-semibold text-ink">{title}</h2>}
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+          {title && <h2 className="font-display text-base font-semibold text-ink">{title}</h2>}
           {right}
         </div>
       )}
@@ -27,7 +27,7 @@ const TONES: Record<string, string> = {
 
 export function Badge({ tone = "gray", children, title }: { tone?: string; children: ReactNode; title?: string }) {
   return (
-    <span title={title} className={`inline-flex items-center rounded px-1.5 py-0.5 text-xs font-medium ring-1 ring-inset ${TONES[tone] ?? TONES.gray}`}>
+    <span title={title} className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ring-1 ring-inset ${TONES[tone] ?? TONES.gray}`}>
       {children}
     </span>
   );
@@ -51,7 +51,7 @@ export function Spinner({ label = "Loading…" }: { label?: string }) {
 export function ErrorBox({ error, onRetry }: { error: unknown; onRetry?: () => void }) {
   const msg = error instanceof Error ? error.message : String(error);
   return (
-    <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+    <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
       {msg}
       {onRetry && <button className="btn ml-3" onClick={onRetry}>Retry</button>}
     </div>
@@ -77,7 +77,7 @@ export function PageHeader({ title, sub, right }: { title: string; sub?: ReactNo
   return (
     <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-ink">{title}</h1>
+        <h1 className="font-display text-2xl font-bold tracking-tight text-ink">{title}</h1>
         {sub && <p className="mt-1 text-sm text-muted">{sub}</p>}
       </div>
       {right}
@@ -85,12 +85,40 @@ export function PageHeader({ title, sub, right }: { title: string; sub?: ReactNo
   );
 }
 
-export function Stat({ label, value, sub, tone }: { label: string; value: ReactNode; sub?: ReactNode; tone?: "up" | "down" }) {
+/** VyaparMitra KPI tile colours: pass `color` for the bold gradient card, omit it for a plain card. */
+const GRADIENTS: Record<string, string> = {
+  green: "from-emerald-400 to-emerald-600",
+  orange: "from-amber-400 to-orange-500",
+  red: "from-rose-400 to-red-500",
+  blue: "from-blue-500 to-indigo-600",
+  violet: "from-violet-500 to-purple-600",
+};
+
+export function Stat({ label, value, sub, tone, color, icon }: {
+  label: string; value: ReactNode; sub?: ReactNode; tone?: "up" | "down";
+  color?: keyof typeof GRADIENTS; icon?: ReactNode;
+}) {
+  if (color) {
+    return (
+      <div className={`relative min-w-0 overflow-hidden rounded-xl bg-gradient-to-br ${GRADIENTS[color]} p-3 text-white shadow-sm sm:p-4`}>
+        <span className="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full bg-white/10" />
+        <span className="pointer-events-none absolute -bottom-8 right-6 h-20 w-20 rounded-full bg-white/10" />
+        <div className="relative flex items-center gap-3">
+          {icon && <span className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/20 sm:flex">{icon}</span>}
+          <div className="min-w-0">
+            <div className="text-xs font-medium text-white/90">{label}</div>
+            <div className="font-mono text-lg font-semibold tracking-tight sm:text-2xl">{value}</div>
+            {sub && <div className="mt-0.5 text-xs text-white/85 sm:truncate">{sub}</div>}
+          </div>
+        </div>
+      </div>
+    );
+  }
   return (
-    <div className="rounded-lg border border-line bg-surface p-3 shadow-sm">
-      <div className="text-xs font-medium uppercase tracking-wide text-muted">{label}</div>
-      <div className="mt-1 text-xl font-semibold text-ink">{value}</div>
-      {sub && <div className={`mt-0.5 text-xs ${tone === "up" ? "text-green-700" : tone === "down" ? "text-red-600" : "text-muted"}`}>{sub}</div>}
+    <div className="min-w-0 rounded-xl border border-line bg-surface p-4 shadow-card">
+      <div className="text-xs font-medium text-muted">{label}</div>
+      <div className="mt-1 font-mono text-xl font-semibold text-ink">{value}</div>
+      {sub && <div className={`mt-0.5 text-xs ${tone === "up" ? "text-emerald-700" : tone === "down" ? "text-red-600" : "text-muted"}`}>{sub}</div>}
     </div>
   );
 }

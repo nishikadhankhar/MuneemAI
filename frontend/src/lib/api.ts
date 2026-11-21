@@ -113,12 +113,23 @@ export class ApiError extends Error {
   }
 }
 
+/** FastAPI validation errors arrive as a list; show "where: what" lines instead of raw JSON. */
+function readableDetail(detail: unknown): string {
+  if (Array.isArray(detail)) {
+    return detail.map((d: any) => {
+      const where = (d?.loc ?? []).filter((x: unknown) => x !== "body").join(" › ");
+      return `${where ? where + ": " : ""}${d?.msg ?? "invalid value"}`;
+    }).join("; ");
+  }
+  return JSON.stringify(detail);
+}
+
 async function handle<T>(res: Response): Promise<T> {
   if (!res.ok) {
     let msg = res.statusText;
     try {
       const body = await res.json();
-      msg = typeof body.detail === "string" ? body.detail : JSON.stringify(body.detail ?? body);
+      msg = typeof body.detail === "string" ? body.detail : readableDetail(body.detail ?? body);
     } catch {
       /* not json */
     }

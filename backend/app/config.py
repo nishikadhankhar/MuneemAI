@@ -76,6 +76,13 @@ class Settings(BaseSettings):
     llm_cooldown_s: int = 60
     chat_history_turns: int = 6
 
+    # bill scanning (photo / PDF -> sales or purchase lines). Uses LLM_API_KEY (Gemini vision).
+    bill_scan_model: str = ""  # empty = same models as LLM_MODEL
+    bill_scan_timeout_s: int = 60
+    bill_scan_max_files: int = 4
+    bill_scan_max_mb: int = 8
+    bill_scan_fake: bool = False  # tests / offline demo only: returns a labelled fixture
+
     # api
     cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
 

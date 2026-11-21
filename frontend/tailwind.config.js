@@ -7,12 +7,14 @@ export default {
       colors: {
         canvas: v("canvas"), surface: v("surface"), "surface-2": v("surface-2"), line: v("line"),
         ink: v("ink"), muted: v("muted"), accent: v("accent"), "accent-soft": v("accent-soft"),
+        nav: v("nav"),
       },
       fontFamily: {
-        sans: ['"Plus Jakarta Sans"', "Inter", "ui-sans-serif", "system-ui", '"Noto Sans Devanagari"', "sans-serif"],
-        display: ['"Fraunces"', "Georgia", "serif"],
+        sans: ['"DM Sans"', "Inter", "ui-sans-serif", "system-ui", '"Noto Sans Devanagari"', "sans-serif"],
+        display: ['"Plus Jakarta Sans"', '"DM Sans"', "ui-sans-serif", "system-ui", "sans-serif"],
+        mono: ['"JetBrains Mono"', "ui-monospace", "SFMono-Regular", "monospace"],
       },
-      boxShadow: { card: "0 1px 0 rgb(0 0 0 / 0.03), 0 1px 3px rgb(30 25 15 / 0.06)" },
+      boxShadow: { card: "0 1px 2px rgb(15 23 42 / 0.04), 0 1px 3px rgb(15 23 42 / 0.06)" },
     },
   },
   plugins: [],

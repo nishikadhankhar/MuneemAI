@@ -199,8 +199,16 @@ flowchart LR
 * **Privacy guard**: customer names, phone numbers, UPI ids, GSTINs, amounts and the shop name are removed from every query before it leaves the server.
 * Web figures are counted as *"from the web"*, never as verified shop numbers. Results are cached for a day with daily caps per provider.
 
-### 8. Interface
-* Warm grey design (off-white cards, deep-green accent, Plus Jakarta Sans + Fraunces).
+### 8. Bill Scanning (photo -> ledger)
+* On the **Data** page, photograph a **supplier invoice** or a **customer cash memo** (printed, thermal or handwritten; up to 4 pages, JPG/PNG/WebP/HEIC/PDF), or use the phone camera.
+* **Gemini vision** reads the lines into a strict JSON schema (temperature 0, nulls instead of guesses). Muneem matches each line to your catalog with the Hinglish-aware matcher and checks **qty x rate = amount**, **lines vs bill total**, **bill date**, **duplicate bill number** and **price vs usual MRP/cost**.
+* Nothing is saved until the owner reviews it: fix a number, re-map a line, create a new product or skip a line. **Purchase** bills add stock (and can update cost prices); **sale** bills add bill lines and reduce stock. Each save creates a new dataset version, so KPIs, alerts, udhaar and the chat see it at once.
+* Uploads are checked by magic bytes, not the declared type. Photos are only sent to read the bill; Muneem keeps the saved lines, not the images.
+* Needs `LLM_API_KEY`. `BILL_SCAN_FAKE=1` returns a clearly labelled test bill for demos and tests. API: `GET /api/bills/status`, `POST /api/bills/scan`, `POST /api/bills/{scan_id}/commit`.
+* Demo bill photos (printed GST invoice, handwritten cash memo, UPI thermal receipt) are in `data/demo-bills/`; the Paytm pitch and demo script are in [`PAYTM_PITCH.md`](PAYTM_PITCH.md).
+
+### 9. Interface
+* Look and feel from the **VyaparMitra** design: navy sidebar with a green active tab, white top bar, cool off-white page, white rounded cards, gradient KPI tiles, DM Sans / Plus Jakarta Sans / JetBrains Mono, red ledger logo. Pages, buttons and flows are Muneem's own.
 * **Customers**: a clickable donut of sales share by segment and a "when did they last come?" bar chart that filter the customer list.
 * **Order progress**: each supplier order drawn as connected 3D blocks — Drafted → Sent → Delivered → Stock updated — with late deliveries flagged.
 * **Landing page** at `/welcome` with scroll-reveal animations.
@@ -432,27 +440,21 @@ flowchart TD
 
 #### On macOS / Linux (Bash)
 ```bash
-# 1. Setup Backend
-cd backend
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000 &
-
-# 2. Setup Frontend
-cd ../frontend
-npm install
-npm run dev
+./dev.sh             # backend on :8000 + web app on :5173 (creates the venv and installs on first run)
+./dev.sh --backend   # backend only (API docs: http://localhost:8000/docs)
+./dev.sh --test      # backend test suite
+PORT=8050 ./dev.sh   # use another backend port if 8000 is taken
 ```
 
-Open your browser at **http://localhost:5173** to access the Muneem AI dashboard, or **http://localhost:5173/welcome** for the landing page.
+Open **http://localhost:5173**. The backend loads the synthetic sample store on first start; **Data → Load sample data** resets it.
+To try bill scanning without a Gemini key, start the backend with `BILL_SCAN_FAKE=1` (results are labelled as a test fixture).
 
 ### Deploying the frontend to Vercel
 ```bash
 cd frontend
 npx vercel@latest deploy --prod --yes --name muneem
 ```
-`frontend/vercel.json` builds with Vite and rewrites every path to `index.html`, so links such as `/welcome` and `/customers` load directly. The app screens need the FastAPI backend; on Vercel alone only the landing page is fully functional.
+`frontend/vercel.json` builds with Vite and rewrites every path to `index.html`, so links such as `/welcome` and `/customers` load directly. The app screens need the FastAPI backend; on Vercel alone only the landing page is fully functional. In dev, Vite proxies `/api` to `MUNEEM_API` (default `http://127.0.0.1:8000`).
 
 ---
 

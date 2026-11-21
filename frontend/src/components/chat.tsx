@@ -30,7 +30,9 @@ export function useChatSession(onConversation?: (id: string) => void) {
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [busy, setBusy] = useState(false);
   const conv = useRef<string | null>(null);
-  const update = (fn: (m: Msg) => Msg) => setMsgs((all) => [...all.slice(0, -1), fn(all[all.length - 1])]);
+  // Stream events patch the last (assistant) message; ignore them if the thread was cleared meanwhile.
+  const update = (fn: (m: Msg) => Msg) =>
+    setMsgs((all) => (all.length && all[all.length - 1].role === "assistant" ? [...all.slice(0, -1), fn(all[all.length - 1])] : all));
 
   const reset = useCallback(() => { setMsgs([]); conv.current = null; }, []);
 

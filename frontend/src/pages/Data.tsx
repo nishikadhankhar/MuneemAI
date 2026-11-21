@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import BillScan, { SavedBills } from "../components/BillScan";
 import { Badge, Card, ErrorBox, PageHeader, Spinner, useAsync } from "../components/ui";
 import { api } from "../lib/api";
 
@@ -18,6 +19,8 @@ export default function Data({ onChange }: { onChange: () => void }) {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<unknown>(null);
   const [sheetsKey, setSheetsKey] = useState(0);
+  const [billSaved, setBillSaved] = useState<string | null>(null);
+  const [savedKey, setSavedKey] = useState(0);
 
   const run = async (fn: () => Promise<any>, then: (r: any) => void) => {
     setBusy(true); setErr(null);
@@ -27,7 +30,7 @@ export default function Data({ onChange }: { onChange: () => void }) {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Data" sub="Bring records from any billing app, spreadsheet or database. Muneem works out what each column means and asks only when unsure." />
+      <PageHeader title="Data" sub="Bring records from any billing app, spreadsheet, database or a photo of a paper bill. Muneem works out what each column means and asks only when unsure." />
 
       <Card title="Current data" right={
         <button className="btn" disabled={busy} onClick={() => confirm("Replace current data with the synthetic sample?") &&
@@ -45,6 +48,16 @@ export default function Data({ onChange }: { onChange: () => void }) {
 
       {!analysis && <SheetsLive onAnalyzed={(a) => { setAnalysis(a); setResult(null); }}
         onChanged={() => { status.reload(); onChange(); }} key={sheetsKey} />}
+
+      {!analysis && <BillScan onSaved={(msg) => { setBillSaved(msg); setSavedKey((k) => k + 1); status.reload(); onChange(); }} />}
+      {billSaved && (
+        <div className="flex items-center justify-between gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+          <span>✓ {billSaved}</span>
+          <button className="btn" onClick={() => setBillSaved(null)}>OK</button>
+        </div>
+      )}
+
+      {!analysis && <SavedBills refreshKey={savedKey} />}
 
       {!analysis && (
         <div className="grid gap-4 md:grid-cols-2">

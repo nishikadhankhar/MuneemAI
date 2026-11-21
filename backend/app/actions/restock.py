@@ -175,6 +175,69 @@ class RestockStore:
         if self._loaded:
             return
         self._loaded = True
+        try:
+            self._load_from_db()
+        finally:
+            if not self.orders:
+                self._load_sample()
+
+    # Sample shop only: a short order history so "Stock & orders" is not empty on first open.
+    # (supplier_id, created days ago, outcome, delivered days after sending); dates are relative
+    # to today so the pipeline shows "waiting" and "late" correctly. Received orders are history:
+    # their stock is already in the sample inventory, so they do not add stock again.
+    SAMPLE_ORDERS = [
+        ("S01", 12, "received", 2), ("S02", 9, "received", 6), ("S07", 6, "received", 3),
+        ("S06", 7, "sent", None), ("S03", 1, "sent", None), ("S05", 5, "cancelled", None),
+    ]
+
+    def _load_sample(self) -> None:
+        try:
+            ds = self.m.require()
+        except Exception:
+            return
+        if ds.source != "sample":
+            return
+        sold = ds.sales_window(30).groupby("item_id")["qty"].sum()
+        sup_idx, today, shop = ds.supplier_index, self._today(), self.m.settings.shop_name
+        for n, (sid, ago, outcome, took) in enumerate(self.SAMPLE_ORDERS, start=1):
+            if sid not in sup_idx.index:
+                continue
+            items = ds.items[ds.items["supplier_id"] == sid].copy()
+            items["sold"] = items["item_id"].map(sold).fillna(0)
+            items = items.sort_values("sold", ascending=False).head(3)
+            if items.empty:
+                continue
+            created = today - timedelta(days=ago)
+            stamp = lambda d, h: datetime(d.year, d.month, d.day, h, 30, tzinfo=timezone.utc).isoformat()  # noqa: E731
+            lead = int(sup_idx.at[sid, "lead_time_days"])
+            lines = []
+            for r in items.itertuples(index=False):
+                daily = max(r.sold / 30, 0.5)
+                qty = max(int(r.pack_size), int(math.ceil(daily * (lead + 4) / r.pack_size)) * int(r.pack_size))
+                lines.append(POLine(item_id=r.item_id, name=r.name, qty=qty, suggested_qty=qty,
+                                    pack_size=int(r.pack_size), unit_cost_paise=int(r.cost_paise),
+                                    gst_rate=int(r.gst_rate), why="sample order"))
+            po = PurchaseOrder(
+                po_id=f"PO-{created:%y%m%d}-S{n:02d}", draft_id="sample", created_at=stamp(created, 4),
+                supplier_id=sid, supplier=str(sup_idx.at[sid, "name"]), lead_time_days=lead,
+                expected_delivery=(created + timedelta(days=lead)).isoformat(), lines=lines,
+                dataset_version=ds.version, history=[{"status": "draft", "at": stamp(created, 4)}])
+            if outcome in ("sent", "received"):
+                po.history.append({"status": "sent", "at": stamp(created, 5)})
+            if outcome == "received":
+                po.history.append({"status": "received", "at": stamp(created + timedelta(days=took), 9),
+                                   "received_qty": {l.item_id: l.qty for l in lines}})
+            if outcome == "cancelled":
+                po.history.append({"status": "cancelled", "at": stamp(created, 8)})
+            po.status = outcome
+            _recompute(po, shop, self._phone(sid), created)
+            self.orders[po.po_id] = po
+        try:  # and today's draft from the live reorder plan, so the Draft tab has work waiting
+            self.create_draft()
+        except Exception as exc:  # pragma: no cover - empty plan is fine
+            log.info("no sample draft: %s", exc)
+
+    def _load_from_db(self) -> None:
         if self.m.sql is not None:
             try:
                 for d in self.m.sql.purchase_orders():

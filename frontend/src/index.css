@@ -2,40 +2,46 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Warm grey palette: page is grey, cards are off-white, nothing is pure white. */
+/* VyaparMitra look: cool off-white page, white cards, slate borders, navy sidebar,
+   blue primary actions and emerald highlights. Components only use these tokens. */
 :root {
-  --canvas: 236 234 229;     /* page */
-  --surface: 248 247 244;    /* cards */
-  --surface-2: 228 226 220;  /* hover, insets, table heads */
-  --line: 218 214 205;       /* borders */
-  --ink: 31 30 27;           /* main text */
-  --muted: 110 106 98;       /* secondary text */
-  --accent: 47 111 79;       /* deep green */
-  --accent-soft: 220 233 224;
+  --canvas: 244 247 252;     /* page  #F4F7FC */
+  --surface: 255 255 255;    /* cards */
+  --surface-2: 241 245 249;  /* hover, insets, table heads (slate-100) */
+  --line: 226 232 240;       /* borders (slate-200) */
+  --ink: 15 23 42;           /* main text (slate-900) */
+  --muted: 100 116 139;      /* secondary text (slate-500) */
+  --accent: 37 99 235;       /* blue-600 */
+  --accent-soft: 219 234 254;
+  --nav: 31 36 55;           /* sidebar #1F2437 */
 }
 
 body {
   @apply bg-canvas text-ink antialiased;
-  font-family: "Plus Jakarta Sans", Inter, ui-sans-serif, system-ui, "Noto Sans Devanagari", sans-serif;
+  font-family: "DM Sans", Inter, ui-sans-serif, system-ui, "Noto Sans Devanagari", sans-serif;
 }
-h1 { font-family: "Fraunces", Georgia, serif; font-optical-sizing: auto; letter-spacing: -0.01em; }
+h1, h2, h3, .font-display {
+  font-family: "Plus Jakarta Sans", "DM Sans", ui-sans-serif, system-ui, "Noto Sans Devanagari", sans-serif;
+  letter-spacing: -0.01em;
+}
 .tabular-nums, td, .num { font-variant-numeric: tabular-nums; }
+.font-mono, .num-mono { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace; }
 
 .btn {
-  @apply inline-flex items-center gap-1.5 rounded-lg border border-line bg-surface px-3 py-1.5
-    text-sm font-medium text-ink transition hover:bg-surface-2 disabled:cursor-not-allowed disabled:opacity-50;
+  @apply inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3.5 py-2
+    text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50;
 }
 .btn-dark {
-  @apply border-ink bg-ink text-surface hover:bg-ink/85;
+  @apply border-[#1F2437] bg-[#1F2437] text-white hover:bg-slate-800;
 }
 .btn-primary {
-  @apply border-accent bg-accent text-surface hover:bg-accent/90;
+  @apply border-blue-600 bg-blue-600 text-white hover:bg-blue-700;
 }
 .btn-green {
-  @apply border-green-600 bg-green-600 text-white hover:bg-green-700;
+  @apply border-emerald-600 bg-emerald-600 text-white hover:bg-emerald-700;
 }
 .input {
-  @apply rounded-md border border-line bg-surface px-2.5 py-1.5 text-sm text-ink placeholder:text-muted/70
+  @apply rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-sm text-ink placeholder:text-muted/70
     focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent;
 }
 .prose-chat p { @apply my-1.5; }

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import ChartView from "../components/ChartView";
+import Icon from "../components/Icon";
 import TableView from "../components/TableView";
 import { Badge, Card, ErrorBox, Spinner, Stat, useAsync } from "../components/ui";
 import { api, Insight } from "../lib/api";
@@ -45,18 +46,18 @@ export default function Dashboard() {
     <div className="space-y-5">
       <header className="flex flex-wrap items-end justify-between gap-2">
         <div>
-          <h1 className="text-xl font-bold text-ink">Dashboard</h1>
+          <h1 className="font-display text-2xl font-bold tracking-tight text-ink">Dashboard</h1>
           <p className="text-sm text-muted">Last 30 days · data as of {alerts.as_of}</p>
         </div>
         <Link to="/" className="btn btn-dark">Ask Muneem</Link>
       </header>
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <Stat label="Sales" value={inr(h.revenue_rs)} sub={<Delta v={h.revenue_change_pct} />}
+        <Stat color="green" icon={<span className="text-xl font-semibold">₹</span>} label="Sales" value={inr(h.revenue_rs)} sub={<Delta v={h.revenue_change_pct} />}
           tone={h.revenue_change_pct >= 0 ? "up" : "down"} />
-        <Stat label="Margin after GST" value={inr(h.gross_margin_rs)} sub={`${pct(h.gross_margin_pct)} of taxable sales`} />
-        <Stat label="Net estimate" value={inr(h.net_profit_estimate_rs)} sub="margin − overheads" />
-        <Stat label="GST collected" value={inr(h.gst_collected_rs)} sub={`${num(h.bills)} bills · avg ${inr(h.avg_bill_rs)}`} />
+        <Stat color="orange" icon={<Icon name="chart" size={20} />} label="Margin after GST" value={inr(h.gross_margin_rs)} sub={`${pct(h.gross_margin_pct)} of taxable sales`} />
+        <Stat color="red" icon={<Icon name="spark" size={20} />} label="Net estimate" value={inr(h.net_profit_estimate_rs)} sub="margin − overheads" />
+        <Stat color="blue" icon={<Icon name="box" size={20} />} label="GST collected" value={inr(h.gst_collected_rs)} sub={`${num(h.bills)} bills · avg ${inr(h.avg_bill_rs)}`} />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">

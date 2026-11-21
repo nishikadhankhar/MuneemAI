@@ -16,7 +16,7 @@ from fastapi.responses import JSONResponse
 from app import __version__
 from app.agent.core import Agent
 from app.agent.llm import build_backend
-from app.api import campaigns, chat, crm, data, findings, ingest, insights, restock, sheets
+from app.api import bills, campaigns, chat, crm, data, findings, ingest, insights, inventory, restock, sheets
 from app.config import get_settings
 from app.store.manager import DataManager, NoDataset
 
@@ -59,6 +59,8 @@ def create_app() -> FastAPI:
     app.include_router(campaigns.router)
     app.include_router(ingest.router)
     app.include_router(sheets.router)
+    app.include_router(bills.router)
+    app.include_router(inventory.router)
     return app
 
 
